@@ -1,4 +1,5 @@
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -18,12 +19,17 @@ public class ServiceDiscovery {
             Socket server;
             serviceTracker.start();
             DataInputStream in;
+            DataOutputStream out;
             String serviceId = "";
             while (true) {
                 server = serverSocket.accept();
                 in = new DataInputStream(server.getInputStream());
                 serviceId = in.readUTF();
                 serviceTracker.updateService(UUID.fromString(serviceId));
+                out = new DataOutputStream(server.getOutputStream());
+                out.writeUTF("ACK for id: " + serviceId);
+                out.flush();
+                out.close();
                 logger.info(String.format("heartbeat for service %s received",serviceId));
 
             }
