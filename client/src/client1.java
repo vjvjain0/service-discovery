@@ -1,3 +1,4 @@
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.UUID;
@@ -12,11 +13,19 @@ class connection extends Thread
     public void run()
     {
         while(true) {
+            DataInputStream in;
+            DataOutputStream out;
             try {
                 Socket client = new Socket("localhost", 9000);
-                DataOutputStream out = new DataOutputStream(client.getOutputStream());
+                out = new DataOutputStream(client.getOutputStream());
                 out.writeUTF(id.toString());
                 out.flush();
+                try {
+                    in = new DataInputStream(client.getInputStream());
+                    System.out.println(in.readUTF());
+                } catch(Exception e) {
+                    System.out.println("Server is not reachable");
+                }
                 out.close();
                 client.close();
                 Thread.sleep(20000);
